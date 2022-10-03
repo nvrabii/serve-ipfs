@@ -4,6 +4,7 @@ import { connectToIpfs, setIpfsRoot, beforeGet, afterGet } from '../middleware/i
 
 const router = express.Router()
 
-router.get('*', beforeGet, connectToIpfs, setIpfsRoot, getIpfsFile, afterGet)
+router.get('/ipfs/', beforeGet, connectToIpfs, setIpfsRoot, getIpfsFile, afterGet)
+router.get('/ipns/', beforeGet, connectToIpfs, setIpfsRoot, getIpfsFile, afterGet)
 
 export default router

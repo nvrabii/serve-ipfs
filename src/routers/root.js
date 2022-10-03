@@ -10,7 +10,6 @@ import {
 
 const router = express.Router()
 
-router.get('/ipfs/*', beforeGet, connectToIpfs, setIpfsRoot, setRetryDefault, getIpfsFile, afterGet)
-router.get('/ipns/*', beforeGet, connectToIpfs, setIpfsRoot, setRetryDefault, getIpfsFile, afterGet)
+router.get('*', beforeGet, connectToIpfs, setIpfsRoot, setRetryDefault, getIpfsFile, afterGet)
 
 export default router
