@@ -1,11 +1,12 @@
-import * as mime from 'mime-types'
 import all from 'it-all'
 import { extract } from 'it-tar'
 import { pipe } from 'it-pipe'
 import { concat as uint8ArrayConcat } from 'uint8arrays/concat'
 
-import { info, success, warn } from '../utils/console.js'
+import { err, warn } from '../utils/console.js'
 import NotFoundError from '../errors/NotFoundError.js'
+
+const DEFAULT_PATH = '/index.html'
 
 /**
  *
@@ -19,25 +20,27 @@ async function getIpfsFile(req, res, next) {
   let data
 
   try {
-    info('GET', req.url)
-
     data = await handleGetIpfsFile(ipfs, ipfsRoot + path)
   } catch (_) {
-    const defaultPath = '/index.html'
-
     if (!retryDefault) return next(e)
-    if (path === defaultPath) return next(new NotFoundError())
+    if (path === DEFAULT_PATH) return next(new NotFoundError(path))
 
-    warn('GET', `${path} not found, redirected to ${defaultPath}`)
+    warn('GET', `${path} not found, redirected to ${DEFAULT_PATH}`)
 
-    path = defaultPath
-    data = await handleGetIpfsFile(ipfs, ipfsRoot + path)
-  } finally {
-    success('GET', path)
+    path = DEFAULT_PATH
 
-    res.setHeader('Content-type', mime.lookup(path))
-    res.status(200).send(data)
+    try {
+      data = await handleGetIpfsFile(ipfs, ipfsRoot + path)
+    } catch (e) {
+      err('getIpfsFile()', e.message)
+      return next(e)
+    }
   }
+
+  res.locals.data = data
+  res.locals.path = path
+
+  next()
 }
 
 async function handleGetIpfsFile(ipfs, ipfsPath) {
