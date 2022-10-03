@@ -21,9 +21,11 @@ async function getIpfsFile(req, res, next) {
 
   try {
     data = await handleGetIpfsFile(ipfs, ipfsRoot + path)
-  } catch (_) {
-    if (!retryDefault) return next(e)
-    if (path === DEFAULT_PATH) return next(new NotFoundError(path))
+  } catch (e) {
+    if (!retryDefault || path === DEFAULT_PATH) {
+      const prefix = ipfsRoot === process.env.IPFS_ROOT_PATH ? '[root]' : ipfsRoot
+      return next(new NotFoundError(prefix + path))
+    }
 
     warn('GET', `${path} not found, redirected to ${DEFAULT_PATH}`)
 

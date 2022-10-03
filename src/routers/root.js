@@ -1,33 +1,16 @@
 import express from 'express'
 import { getIpfsFile } from '../handlers/index.js'
-import { connectToIpfs, setIpfsRoot, setRetryDefault } from '../middleware/index.js'
-import { info, success } from '../utils/console.js'
-import * as mime from 'mime-types'
-
-const handler = express.Router()
-
-handler.get(
-  '*',
-  beforeMiddleware,
+import {
+  afterGet,
+  beforeGet,
   connectToIpfs,
   setIpfsRoot,
-  setRetryDefault,
-  getIpfsFile,
-  afterMiddleware
-)
+  setRetryDefault
+} from '../middleware/index.js'
 
-function beforeMiddleware(req, _, next) {
-  info('GET', req.url)
-  next()
-}
+const router = express.Router()
 
-function afterMiddleware(_, res) {
-  success('GET', path)
+router.get('/ipfs/*', beforeGet, connectToIpfs, setIpfsRoot, setRetryDefault, getIpfsFile, afterGet)
+router.get('/ipns/*', beforeGet, connectToIpfs, setIpfsRoot, setRetryDefault, getIpfsFile, afterGet)
 
-  const { path, data } = res.locals
-  res.setHeader('Content-type', mime.lookup(path))
-  res.status(200)
-  res.end(data)
-}
-
-export default handler
+export default router
