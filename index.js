@@ -5,8 +5,8 @@ import fs from 'fs'
 import http from 'http'
 import https from 'https'
 
-import unsafeApp from './src/unsafe/app.js'
 import app from './src/app.js'
+import logError from './src/utils/logger.js'
 
 if (process.env.SSL_KEY && process.env.SSL_CERT) {
   createHttpsServer()
@@ -20,17 +20,40 @@ function createHttpsServer() {
     cert: fs.readFileSync(process.env.SSL_CERT)
   }
 
-  https.createServer(options, app).listen(443, () => {
-    console.log('Server started at https://localhost ...')
-  })
+  https
+    .createServer(options, app)
+    .listen(443, () => {
+      console.log('Server started at https://localhost ...')
+    })
+    .on('error', (err) => {
+      logError(err, 'https')
+    })
 
-  http.createServer(unsafeApp).listen(80, () => {
-    console.log('Server started at http://localhost ...')
-  })
+  http
+    .createServer((req, res) => {
+      res.writeHead(301, { Location: 'https://' + req.headers.host + req.url })
+      res.end()
+    })
+    .listen(80, () => {
+      console.log('Server started at http://localhost ...')
+    })
+    .on('error', (err) => {
+      err
+      logError(err, 'http')
+    })
 }
 
 function createHttpServerOnly() {
-  http.createServer(app).listen(80, () => {
-    console.log('Server started at http://localhost ...')
-  })
+  http
+    .createServer(app)
+    .listen(80, () => {
+      console.log('Server started at http://localhost ...')
+    })
+    .on('error', (err) => {
+      logError(err, 'http')
+    })
 }
+
+process.on('uncaughtException', (err) => {
+  logError(err, 'process')
+})

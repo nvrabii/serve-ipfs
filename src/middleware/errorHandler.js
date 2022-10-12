@@ -6,11 +6,14 @@ function errorHandler(err, req, res, next) {
   if (res.headersSent) return next(err)
 
   let errorCode = 500
-  let errorMessage = 'Internal server error'
+  let errorMessage = 'Internal Server Error'
 
-  if (err instanceof IpfsClientOfflineError || err instanceof NotFoundError) {
+  if (err instanceof NotFoundError) {
     errorCode = err.code
     errorMessage = err.message
+  } else if (err instanceof IpfsClientOfflineError) {
+    errorCode = err.code
+    errorMessage = 'Service Unavailable'
   }
 
   error(errorCode, errorMessage)

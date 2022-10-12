@@ -14,13 +14,13 @@ const DEFAULT_PATH = '/index.html'
  * @param {string} res.locals.ipfsRoot - IPFS path to the required file
  * @param {boolean} res.locals.retryDefault - redirect request to default path `/index.html` if file not found
  */
-async function getIpfsFile(req, res, next) {
+async function getIpfsFileHandler(req, res, next) {
   const { ipfs, ipfsRoot, retryDefault } = res.locals
   let path = req.url
   let data
 
   try {
-    data = await handleGetIpfsFile(ipfs, ipfsRoot + path)
+    data = await getIpfsFile(ipfs, ipfsRoot + path)
   } catch (e) {
     if (!retryDefault || path === DEFAULT_PATH) {
       const prefix = ipfsRoot === process.env.IPFS_ROOT_PATH ? '[root]' : ipfsRoot
@@ -32,7 +32,7 @@ async function getIpfsFile(req, res, next) {
     path = DEFAULT_PATH
 
     try {
-      data = await handleGetIpfsFile(ipfs, ipfsRoot + path)
+      data = await getIpfsFile(ipfs, ipfsRoot + path)
     } catch (e) {
       err('getIpfsFile()', e.message)
       return next(e)
@@ -45,7 +45,7 @@ async function getIpfsFile(req, res, next) {
   next()
 }
 
-async function handleGetIpfsFile(ipfs, ipfsPath) {
+async function getIpfsFile(ipfs, ipfsPath) {
   return uint8ArrayConcat(await pipe(ipfs.get(ipfsPath), extract(), extractTarball))
 }
 
@@ -56,4 +56,4 @@ async function extractTarball(source) {
   }
 }
 
-export default getIpfsFile
+export default getIpfsFileHandler

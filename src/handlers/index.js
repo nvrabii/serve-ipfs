@@ -1,3 +1,3 @@
-import getIpfsFile from './getIpfsFile.js'
+import getIpfsFileHandler from './getIpfsFileHandler.js'
 
-export { getIpfsFile }
+export { getIpfsFileHandler }

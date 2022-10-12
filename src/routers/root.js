@@ -1,5 +1,5 @@
 import express from 'express'
-import { getIpfsFile } from '../handlers/index.js'
+import { getIpfsFileHandler } from '../handlers/index.js'
 import {
   afterGet,
   beforeGet,
@@ -10,6 +10,14 @@ import {
 
 const router = express.Router()
 
-router.get('*', beforeGet, connectToIpfs, setIpfsRoot, setRetryDefault, getIpfsFile, afterGet)
+router.get(
+  '*',
+  beforeGet,
+  connectToIpfs,
+  setIpfsRoot,
+  setRetryDefault,
+  getIpfsFileHandler,
+  afterGet
+)
 
 export default router

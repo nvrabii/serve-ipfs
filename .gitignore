@@ -1,6 +1,12 @@
+# system
 .DS_Store
 
+# config
 *.env
 *.pem
 
+# deps
 node_modules
+
+# logs
+logs
