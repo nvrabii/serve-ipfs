@@ -1,6 +1,6 @@
 import express from 'express'
 import { root, ipfs } from './routers/index.js'
-import { errorHandler } from './middleware/index.js'
+import { errorHandler } from './handlers/index.js'
 
 const app = express()
 

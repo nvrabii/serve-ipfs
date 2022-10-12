@@ -3,14 +3,12 @@ import { info } from '../utils/console.js'
 
 const router = express.Router()
 
-router.get('/ipfs', getHandlerFor('/ipfs'))
-router.get('/ipns', getHandlerFor('/ipns'))
+router.get('/ipfs/*', redirectToIpfsHandler)
+router.get('/ipns/*', redirectToIpfsHandler)
 
-function getHandlerFor(prefix) {
-  return (req, res) => {
-    info('GET', prefix + req.url)
-    res.redirect('localhost:8080' + prefix + req.url)
-  }
+function redirectToIpfsHandler(req, res) {
+  info('GET', req.url)
+  res.redirect('http://localhost:8080' + req.url)
 }
 
 export default router
