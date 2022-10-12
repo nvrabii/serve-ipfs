@@ -1,12 +1,16 @@
 import express from 'express'
-import { getIpfsFileHandler } from '../handlers/index.js'
-import { connectToIpfs, setIpfsRoot, beforeGet, afterGet } from '../middleware/index.js'
+import { info } from '../utils/console.js'
 
 const router = express.Router()
 
-const handlersChain = [beforeGet, connectToIpfs, setIpfsRoot, getIpfsFileHandler, afterGet]
+router.get('/ipfs', getHandlerFor('/ipfs'))
+router.get('/ipns', getHandlerFor('/ipns'))
 
-router.get('/ipfs', ...handlersChain)
-router.get('/ipns', ...handlersChain)
+function getHandlerFor(prefix) {
+  return (req, res) => {
+    info('GET', prefix + req.url)
+    res.redirect('localhost:8080' + prefix + req.url)
+  }
+}
 
 export default router

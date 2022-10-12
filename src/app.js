@@ -4,8 +4,8 @@ import { errorHandler } from './middleware/index.js'
 
 const app = express()
 
-app.use('/', ipfs)
-app.use('/', root)
+app.use(ipfs)
+app.use(root)
 
 app.use(errorHandler)
 
