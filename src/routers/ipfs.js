@@ -1,12 +1,12 @@
 import express from 'express'
 import { getIpfsFileHandler } from '../handlers/index.js'
-import { connectToIpfs, setIpfsRoot, beforeGet, afterGet } from '../middleware/index.js'
+import { afterGet, beforeGet, connectToIpfs, setIpfsRoot } from '../middleware/index.js'
 
 const router = express.Router()
 
-const handlersChain = [beforeGet, connectToIpfs, setIpfsRoot, getIpfsFileHandler, afterGet]
+const handlers = [beforeGet, setIpfsRoot, connectToIpfs, getIpfsFileHandler, afterGet]
 
-router.get('/ipfs', ...handlersChain)
-router.get('/ipns', ...handlersChain)
+router.get('/ipfs/*', handlers)
+router.get('/ipns/*', handlers)
 
 export default router

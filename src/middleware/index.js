@@ -1,7 +1,7 @@
 import connectToIpfs from './connectToIpfs.js'
-import setIpfsRoot from './setIpfsRoot.js'
-import setRetryDefault from './setRetryDefault.js'
 import beforeGet from './beforeGet.js'
 import afterGet from './afterGet.js'
+import setIpfsRoot from './setIpfsRoot.js'
+import setRetryDefault from './setRetryDefault.js'
 
-export { connectToIpfs, setIpfsRoot, setRetryDefault, beforeGet, afterGet }
+export { connectToIpfs, beforeGet, afterGet, setIpfsRoot, setRetryDefault }

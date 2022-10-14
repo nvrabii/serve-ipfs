@@ -1,5 +1,6 @@
-function setRetryDefault(req, res, next) {
+function setRetryDefault(_, res, next) {
   res.locals.retryDefault = true
+
   next()
 }
 

@@ -23,7 +23,7 @@ function err(title, msg) {
 }
 
 function printColored(text, msg, color) {
-  console.log(`${color}${text}${colors.RESET}: ${msg}`)
+  if (process.env.NODE_ENV !== 'test') console.log(`${color}${text}${colors.RESET}: ${msg}`)
 }
 
 export { info, success, warn, err }

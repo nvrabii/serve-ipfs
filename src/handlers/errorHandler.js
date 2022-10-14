@@ -2,7 +2,7 @@ import { IpfsClientOfflineError, NotFoundError } from '../errors/index.js'
 
 import { err as error } from '../utils/console.js'
 
-function errorHandler(err, req, res, next) {
+function errorHandler(err, _, res, next) {
   if (res.headersSent) return next(err)
 
   let errorCode = 500

@@ -1,13 +1,16 @@
-import * as ipfsHttpClient from 'ipfs-http-client'
+const ipfsHttpClient =
+  process.env.NODE_ENV === 'test'
+    ? await import('../../test/mocks/ipfsHttpClient.js')
+    : await import('ipfs-http-client')
 
 import { IpfsClientOfflineError } from '../errors/index.js'
 import { info } from '../utils/console.js'
 
-const connectToIpfs = async (req, res, next) => {
+const connectToIpfs = async (_, res, next) => {
   const ipfs = ipfsHttpClient.create(process.env.IPFS_API)
 
   try {
-    if (!(await ipfs.isOnline())) return next(new IpfsClientOfflineError())
+    if (!(await ipfs.isOnline())) throw new Error()
   } catch (_) {
     return next(new IpfsClientOfflineError())
   }

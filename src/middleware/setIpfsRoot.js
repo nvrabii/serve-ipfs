@@ -3,7 +3,7 @@ function setIpfsRoot(req, res, next) {
 
   if (path[1] === 'ipfs' || path[1] === 'ipns') {
     res.locals.ipfsRoot = `/${path.slice(1, 3).join('/')}`
-    req.url = `/${path.slice(3).join('/')}`
+    req.url = req.url.slice(res.locals.ipfsRoot.length)
   } else {
     res.locals.ipfsRoot = process.env.IPFS_ROOT_PATH
   }

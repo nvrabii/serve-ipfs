@@ -2,6 +2,7 @@ import all from 'it-all'
 import { extract } from 'it-tar'
 import { pipe } from 'it-pipe'
 import { concat as uint8ArrayConcat } from 'uint8arrays/concat'
+import * as fs from 'fs'
 
 import { err, warn } from '../utils/console.js'
 import NotFoundError from '../errors/NotFoundError.js'
@@ -9,9 +10,9 @@ import NotFoundError from '../errors/NotFoundError.js'
 const DEFAULT_PATH = '/index.html'
 
 /**
- * @param {IpfsHttpClient} res.locals.ipfs - IpfsHttpClient instance
- * @param {string} res.locals.ipfsRoot - IPFS path to the required file
- * @param {boolean} res.locals.retryDefault - redirect request to default path `/index.html` if file not found
+ * @param {IPFSHTTPClient} res.locals.ipfs
+ * @param {boolean} res.locals.retryDefault
+ * @param {string} res.locals.ipfsRoot
  */
 async function getIpfsFileHandler(req, res, next) {
   const { ipfs, ipfsRoot, retryDefault } = res.locals
@@ -20,21 +21,23 @@ async function getIpfsFileHandler(req, res, next) {
 
   try {
     data = await getIpfsFile(ipfs, ipfsRoot + path)
-  } catch (e) {
+  } catch (_) {
+    const prefix = ipfsRoot === process.env.IPFS_ROOT_PATH ? '[root]' : ipfsRoot
+
     if (!retryDefault || path === DEFAULT_PATH) {
-      const prefix = ipfsRoot === process.env.IPFS_ROOT_PATH ? '[root]' : ipfsRoot
       return next(new NotFoundError(prefix + path))
     }
 
     warn('GET', `${path} not found, redirected to ${DEFAULT_PATH}`)
 
+    const oldPath = path
     path = DEFAULT_PATH
 
     try {
       data = await getIpfsFile(ipfs, ipfsRoot + path)
     } catch (e) {
       err('getIpfsFile()', e.message)
-      return next(e)
+      return next(new NotFoundError(prefix + oldPath))
     }
   }
 
@@ -45,7 +48,11 @@ async function getIpfsFileHandler(req, res, next) {
 }
 
 async function getIpfsFile(ipfs, ipfsPath) {
-  return uint8ArrayConcat(await pipe(ipfs.get(ipfsPath), extract(), extractTarball))
+  if (process.env.NODE_ENV === 'test') {
+    return fs.readFileSync(ipfsPath).toLocaleString()
+  } else {
+    return uint8ArrayConcat(await pipe(ipfs.get(ipfsPath), extract(), extractTarball))
+  }
 }
 
 async function extractTarball(source) {

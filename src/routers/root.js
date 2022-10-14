@@ -4,8 +4,8 @@ import {
   afterGet,
   beforeGet,
   connectToIpfs,
-  setIpfsRoot,
-  setRetryDefault
+  setRetryDefault,
+  setIpfsRoot
 } from '../middleware/index.js'
 
 const router = express.Router()
@@ -13,9 +13,9 @@ const router = express.Router()
 router.get(
   '*',
   beforeGet,
-  connectToIpfs,
   setIpfsRoot,
   setRetryDefault,
+  connectToIpfs,
   getIpfsFileHandler,
   afterGet
 )
