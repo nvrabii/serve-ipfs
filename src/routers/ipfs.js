@@ -8,7 +8,10 @@ router.get('/ipns/*', redirectToIpfsHandler)
 
 function redirectToIpfsHandler(req, res) {
   info('GET', req.url)
-  res.redirect('http://localhost:8080' + req.url)
+
+  const connection = req.secure ? 'https://' : 'https://'
+
+  res.redirect(connection + req.headers.host + ':8080' + req.url)
 }
 
 export default router
