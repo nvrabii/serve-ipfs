@@ -10,23 +10,28 @@ const DEFAULT_PATH = '/index.html'
 
 /**
  * @param {IpfsHttpClient} res.locals.ipfs - IpfsHttpClient instance
+ * @param {string} res.locals.ipfsRoot - IPFS path to the required file
+ * @param {boolean} res.locals.retryDefault - redirect request to default path `/index.html` if file not found
  */
 async function getIpfsFileHandler(req, res, next) {
-  const { ipfs } = res.locals
-  let path = req.url === '/' ? DEFAULT_PATH : req.url
+  const { ipfs, ipfsRoot, retryDefault } = res.locals
+  let path = req.url
   let data
 
   try {
-    data = await getIpfsFile(ipfs, process.env.IPFS_ROOT_PATH + path)
+    data = await getIpfsFile(ipfs, ipfsRoot + path)
   } catch (e) {
-    if (path === DEFAULT_PATH) return next(new NotFoundError('[root]' + path))
+    if (!retryDefault || path === DEFAULT_PATH) {
+      const prefix = ipfsRoot === process.env.IPFS_ROOT_PATH ? '[root]' : ipfsRoot
+      return next(new NotFoundError(prefix + path))
+    }
 
     warn('GET', `${path} not found, redirected to ${DEFAULT_PATH}`)
 
     path = DEFAULT_PATH
 
     try {
-      data = await getIpfsFile(ipfs, process.env.IPFS_ROOT_PATH + path)
+      data = await getIpfsFile(ipfs, ipfsRoot + path)
     } catch (e) {
       err('getIpfsFile()', e.message)
       return next(e)
