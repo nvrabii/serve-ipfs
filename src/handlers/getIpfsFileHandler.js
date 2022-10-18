@@ -19,6 +19,10 @@ async function getIpfsFileHandler(req, res, next) {
   let path = req.url
   let data
 
+  if (process.env.NODE_ENV === 'test' && process.env.FORCE_IPFS_ROOT_PATH === 'true') {
+    ipfsRoot = process.env.IPFS_ROOT_PATH
+  }
+
   try {
     data = await getIpfsFile(ipfs, ipfsRoot + path)
   } catch (_) {
