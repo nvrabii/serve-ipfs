@@ -7,6 +7,7 @@ import https from 'https'
 
 import app from './src/app.js'
 import logError from './src/utils/logger.js'
+import { err as printError } from './src/utils/console.js'
 
 if (process.env.SSL_KEY && process.env.SSL_CERT) {
   createHttpsServer()
@@ -55,5 +56,6 @@ function createHttpServerOnly() {
 }
 
 process.on('uncaughtException', (err) => {
+  printError('PROCESS', err.message)
   logError(err, 'process')
 })

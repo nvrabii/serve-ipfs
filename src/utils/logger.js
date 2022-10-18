@@ -1,3 +1,5 @@
+import * as fs from 'fs'
+
 function logError(err, label) {
   if (!fs.existsSync('logs')) fs.mkdirSync('logs')
 
