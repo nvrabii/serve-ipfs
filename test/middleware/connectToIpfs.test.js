@@ -6,7 +6,7 @@ import { IPFSHTTPClient } from '../mocks/ipfsHttpClient.js'
 import { IpfsClientOfflineError } from '../../src/errors/index.js'
 import { connectToIpfs } from '../../src/middleware/index.js'
 
-describe('connectToIpfs middleware', async () => {
+describe('connectToIpfs middleware', () => {
   const next = (x) => x
 
   it('returns an IpfsClientOfflienError on error', async () => {

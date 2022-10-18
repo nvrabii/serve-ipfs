@@ -9,7 +9,7 @@ import app from './src/app.js'
 import logError from './src/utils/logger.js'
 import { err as printError } from './src/utils/console.js'
 
-if (process.env.SSL_KEY && process.env.SSL_CERT) {
+if (process.env.NODE_ENV !== 'test' && process.env.SSL_KEY && process.env.SSL_CERT) {
   createHttpsServer()
 } else {
   createHttpServerOnly()

@@ -17,7 +17,7 @@ const EXPECTED_IPFS_ROOTS = [
   '/ipns/something',
   '/ipns/something'
 ]
-const EXPECTED_IPFS_URLS = ['', '/index.html', '', '/index.html']
+const EXPECTED_IPFS_URLS = ['', '/', '', '/index.html']
 
 describe('setIpfsRoot middleware', () => {
   before(() => {

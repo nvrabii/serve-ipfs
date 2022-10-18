@@ -1,65 +1,54 @@
 import chai from 'chai'
 import { expect } from 'chai'
-import chaiHTTP from 'chai-http'
-import * as fs from 'fs'
+import chaiHttp from 'chai-http'
+import fs from 'fs'
 
 import app from '../../src/app.js'
 
 const IPFS_ROOT = './test/mocks/data'
-const VALID_PATHS = [
-  '/ipfs/somecid/index.json',
-  '/ipfs/somecid/dir/',
-  '/ipfs/somecid/dir/index.html'
-]
-const VALID_PATHS_EXPECTED = [
-  '/ipfs/somecid/index.json',
-  '/ipfs/somecid/dir/index.html',
-  '/ipfs/somecid/dir/index.json'
-]
-const INVALID_PATHS = ['/ipfs/somecid', '/ipfs/somecid/']
+const VALID_PATHS = ['/ipfs/somecid/index.json', '/ipfs/somecid/dir/index.html']
+const VALID_PATHS_EXPECTED = ['/ipfs/somecid/index.json', '/ipfs/somecid/dir/index.html']
+const INVALID_PATHS = ['/ipfs/somecid/', '/ipfs/somecid/dir/', '/ipfs/somecid/dir/index.json']
 
-chai.use(chaiHTTP)
+chai.use(chaiHttp)
 
 describe('/ipfs/ | /ipns/ routes', () => {
-  let server
+  let requester
 
   before(() => {
     process.env.IPFS_ROOT_PATH = IPFS_ROOT
-    process.env.FORCE_IPFS_ROOT_PATH = true
-    server = app.listen(80)
+    process.env.OVERRIDE_IPFS_ROOT = true
+    process.env.IPFS_HTTP_CLIENT_ONLINE = true
+
+    requester = chai.request(app).keepOpen()
   })
 
   after(() => {
-    server.close()
-    process.env.FORCE_IPFS_ROOT_PATH = false
+    requester.close()
+    process.env.OVERRIDE_IPFS_ROOT = false
+    process.env.IPFS_HTTP_CLIENT_ONLINE = false
   })
 
   VALID_PATHS.forEach((path, index) => {
-    it(`should GET ${VALID_PATHS_EXPECTED[index]} from ${path}`, () => {
-      chai
-        .request(app)
-        .get(path)
-        .end((err, res) => {
-          expect(err).is.null
-          expect(res.status).equal(200)
-          const data = fs.readFileSync(IPFS_ROOT + VALID_PATHS_EXPECTED[index]).toLocaleString()
-          expect(res.text).equals(data)
-        })
-        .timeout(1000)
+    it(`should GET ${VALID_PATHS_EXPECTED[index]} from ${path}`, (done) => {
+      requester.get(path).end((err, res) => {
+        expect(err).to.be.null
+        expect(res.status).equal(200)
+        const data = fs.readFileSync(IPFS_ROOT + VALID_PATHS_EXPECTED[index]).toLocaleString()
+        expect(res.text).equals(data)
+        done()
+      })
     })
   })
 
   INVALID_PATHS.forEach((path) => {
-    it(`should not GET ${path}`, () => {
-      chai
-        .request(server)
-        .get(path)
-        .end((err, res) => {
-          expect(err).is.null
-          expect(res.status).equal(404)
-          expect(res.text).equals(`File ${path} not found`)
-        })
-        .timeout(1000)
+    it(`should not GET ${path}`, (done) => {
+      requester.get(path).end((err, res) => {
+        expect(err).is.null
+        expect(res.status).equal(404)
+        expect(res.text).equals(`File ${path} not found`)
+        done()
+      })
     })
   })
 })

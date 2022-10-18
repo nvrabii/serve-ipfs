@@ -11,7 +11,7 @@
   },
   "scripts": {
     "start": "node index.js",
-    "test": "export NODE_ENV=test && mocha 'test/**/*.test.js' --recursive --exit",
+    "test": "export NODE_ENV=test && mocha 'test/**/*.test.js' --recursive",
     "lint": "eslint .",
     "lint:fix": "eslint --fix .",
     "format": "prettier --write './**/*.{js,jsx,md,json}' --config ./.prettierrc"

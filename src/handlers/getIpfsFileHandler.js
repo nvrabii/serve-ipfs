@@ -16,15 +16,16 @@ const DEFAULT_PATH = '/index.html'
  */
 async function getIpfsFileHandler(req, res, next) {
   const { ipfs, ipfsRoot, retryDefault } = res.locals
+  let ipfsRootOverride = null
   let path = req.url
   let data
 
-  if (process.env.NODE_ENV === 'test' && process.env.FORCE_IPFS_ROOT_PATH === 'true') {
-    ipfsRoot = process.env.IPFS_ROOT_PATH
+  if (process.env.NODE_ENV === 'test' && process.env.OVERRIDE_IPFS_ROOT === 'true') {
+    ipfsRootOverride = process.env.IPFS_ROOT_PATH + ipfsRoot
   }
 
   try {
-    data = await getIpfsFile(ipfs, ipfsRoot + path)
+    data = await getIpfsFile(ipfs, (ipfsRootOverride || ipfsRoot) + path)
   } catch (_) {
     const prefix = ipfsRoot === process.env.IPFS_ROOT_PATH ? '[root]' : ipfsRoot
 
@@ -38,7 +39,7 @@ async function getIpfsFileHandler(req, res, next) {
     path = DEFAULT_PATH
 
     try {
-      data = await getIpfsFile(ipfs, ipfsRoot + path)
+      data = await getIpfsFile(ipfs, (ipfsRootOverride || ipfsRoot) + path)
     } catch (e) {
       err('getIpfsFile()', e.message)
       return next(new NotFoundError(prefix + oldPath))
@@ -53,7 +54,7 @@ async function getIpfsFileHandler(req, res, next) {
 
 async function getIpfsFile(ipfs, ipfsPath) {
   if (process.env.NODE_ENV === 'test') {
-    return fs.readFileSync(ipfsPath).toLocaleString()
+    return fs.readFileSync(ipfsPath)
   } else {
     return uint8ArrayConcat(await pipe(ipfs.get(ipfsPath), extract(), extractTarball))
   }

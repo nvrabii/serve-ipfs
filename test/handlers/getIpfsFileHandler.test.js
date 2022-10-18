@@ -29,7 +29,7 @@ describe('getIpfsFileHandler', () => {
     await getIpfsFileHandler(reqMock, resMock, next)
 
     const data = fs.readFileSync(IPFS_ROOT + VALID_PATH).toLocaleString()
-    expect(resMock.locals.data).equals(data)
+    expect(resMock.locals.data.toLocaleString()).equals(data)
     expect(resMock.locals.path).equals(VALID_PATH)
   })
 
@@ -82,7 +82,7 @@ describe('getIpfsFileHandler', () => {
     await getIpfsFileHandler(reqMock, resMock, next)
 
     const data = fs.readFileSync(IPFS_ROOT_W_DEFAULT + DEFAULT_PATH).toLocaleString()
-    expect(resMock.locals.data).equals(data)
+    expect(resMock.locals.data.toLocaleString()).equals(data)
     expect(resMock.locals.path).equals(DEFAULT_PATH)
   })
 
